@@ -21,13 +21,13 @@ const keyAPI = '6a3fe9ad9cae721016566b17c55f3ba7';
 $($).on('submit', function (e) {
   e.preventDefault();
 
-  var searchVal = searchInput.val().trim();
+  let searchVal = searchInput.val().trim();
   getConditions(searchVal);
   searchInput.val('');
 });
 
 function getConditions(searchVal) {
-  var queryUrl =
+  let queryUrl =
     'https://api.openweathermap.org/data/2.5/weather?q=' +
     searchVal +
     '&units=imperial&appid=' +
@@ -39,26 +39,40 @@ function getConditions(searchVal) {
     $.ajax({
       url: queryUrl,
       method: 'GET',
-    })
-      .then(function (response) {
-        console.log(response);
-        city.text(response.name);
-        city.append("<small class='text-muted' id='current-date'>");
-        $('#current-date').text('(' + currentDate + ')');
-        city.append(
-          "<img src='https://openweathermap.org/img/w/" +
-            response.weather[0].icon +
-            ".png' alt='" +
-            response.weather[0].main +
-            "' />"
-        );
-        temp.text(response.main.temp);
-        temp.append('&deg;F');
-        humidity.text(response.main.humidity + '%');
-        windSpeed.text(response.wind.speed + 'MPH');
-      })
-      .catch(function () {
-        alert('Your request failed');
+    }).then(function (response) {
+      console.log(response);
+      city.text(response.name);
+      city.append("<small class='text-muted' id='current-date'>");
+      $('#current-date').text('(' + currentDate + ')');
+      city.append(
+        "<img src='https://openweathermap.org/img/w/" +
+          response.weather[0].icon +
+          ".png' alt='" +
+          response.weather[0].main +
+          "' />"
+      );
+      temp.text(response.main.temp);
+      temp.append('&deg;F');
+      humidity.text(response.main.humidity + '%');
+      windSpeed.text(response.wind.speed + 'MPH');
+
+      let lat = response.coord.lat;
+      let lon = response.coord.lon;
+
+      let urlUV =
+        'https://api.openweathermap.org/data/2.5/uvi?&lat=' +
+        lat +
+        '&lon=' +
+        lon +
+        '&appid=' +
+        keyAPI;
+
+      $.ajax({
+        url: urlUV,
+        metho: 'GET',
+      }).then(function (response) {
+        indexUV.text(response.value);
       });
+    });
   }
 }
