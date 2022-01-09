@@ -18,6 +18,7 @@ let currentDate = moment().format('L');
 // API Key
 const keyAPI = '6a3fe9ad9cae721016566b17c55f3ba7';
 
+// Initializes App
 $(function () {
   startHistory();
 });
@@ -35,6 +36,7 @@ $(document).on('submit', function (e) {
   }
 });
 
+// Handles the clear history button
 historyButton.on('click', function () {
   localStorage.clear();
   cityList = [];
@@ -76,7 +78,7 @@ function startHistory() {
 
 function showCurrent(param) {
   // Formats the URL that we are using to query the API
-  let queryUrl = `https://api.openweathermap.org/data/2.5/weather?q=${param}&units=imperial&appid=${keyAPI}`;
+  const queryUrl = `https://api.openweathermap.org/data/2.5/weather?q=${param}&units=imperial&appid=${keyAPI}`;
 
   // Fetch Data
   $.ajax({
@@ -103,23 +105,22 @@ function showCurrent(param) {
       windSpeed.text(r.wind.speed + 'MPH');
 
       // Stores latitude and longitude for uv-index
-      let lat = r.coord.lat;
       let lon = r.coord.lon;
+      let lat = r.coord.lat;
 
       // Calls the function that calculates UV Index & five day cast
-      uvIndex(lat, lon);
+      uvIndex(lon, lat);
       //   fiveDayCast(lat, lon);
     })
     .catch(function (e) {
       console.log(e);
       alert('Your request could not be complete');
     });
-  //   fiveDayCast(lat, lon);
 }
 
-function uvIndex(lat, lon) {
+function uvIndex(lon, lat) {
   // Formats URL for uv call
-  let queryUrl = `https://api.openweathermap.org/data/2.5/uvi?&lat=${lat}&lon=${lon}&appid=${keyAPI}`;
+  const queryUrl = `https://api.openweathermap.org/data/2.5/uvi?&lat=${lat}&lon=${lon}&appid=${keyAPI}`;
 
   // Performs the ajax fetch call
   $.ajax({
@@ -129,6 +130,7 @@ function uvIndex(lat, lon) {
     .then(function (r) {
       indexUV.text(r.value);
 
+      // This conditional will add background to the uv index depending on exposure
       if (indexUV.text() >= 8) indexUV.addClass('btn btn-danger');
       else if (indexUV.text() > 3 && indexUV.text() <= 7)
         indexUV.addClass('btn btn-warning');
@@ -137,5 +139,64 @@ function uvIndex(lat, lon) {
     .catch(function (e) {
       console.log(e);
       alert('There was a problem with your request');
+    });
+}
+
+function fiveDay(lon, lat) {
+  // Format query URL for 5 day cast
+  const queryUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly&units=imperial&appid=${keyAPI}`;
+
+  fiveDayCast.removeClass('hide');
+
+  $.ajax({
+    url: queryUrl,
+    method: 'GET',
+  })
+    .then(function (r) {
+      fiveDayCast.empty();
+
+      for (var i = 1; i < r.daily.length; i++) {
+        let forecastDateString = moment(r.daily[i].dt_txt).format(
+          'L'
+        );
+        let col = $(
+          "<div class='col-12 col-md-6 col-lg forecast-day mb-3'>"
+        );
+        let card = $("<div class='card'>");
+        let cardBody = $("<div class='card-body'>");
+        let fDate = $("<h5 class='card-title'>");
+        let fIcon = $('<img>');
+        let temp = $("<p class='card-text mb-0'>");
+        let humidity = $("<p class='card-text mb-0'>");
+
+        fiveDayCast.append(col);
+        col.append(card);
+        card.append(cardBody);
+
+        cardBody.append(fDate);
+        cardBody.append(fIcon);
+        cardBody.append(temp);
+        cardBody.append(humidity);
+
+        fIcon.attr(
+          'src',
+          'https://openweathermap.org/img/w/' +
+            r.daily[i].weather[0].icon +
+            '.png'
+        );
+
+        fIcon.attr('alt', r.daily[i].weather[0].main);
+        fDate.text(forecastDateString);
+        temp.text(r.daily[i].temp.day);
+        temp.prepend('Temp: ');
+        temp.append('&deg;F');
+        humidity.text(r.daily[i].humidity);
+        humidity.prepend('Humidity: ');
+        humidity.append('%');
+      }
+    })
+    .catch(function (e) {
+      console.log(e);
+      alert('Your request could not be complete');
     });
 }
