@@ -128,6 +128,11 @@ function uvIndex(lat, lon) {
   })
     .then(function (r) {
       indexUV.text(r.value);
+
+      if (indexUV.text() >= 8) indexUV.addClass('btn btn-danger');
+      else if (indexUV.text() > 3 && indexUV.text() <= 7)
+        indexUV.addClass('btn btn-warning');
+      else indexUV.addClass('btn btn-success');
     })
     .catch(function (e) {
       console.log(e);
