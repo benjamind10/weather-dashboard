@@ -73,3 +73,36 @@ function startHistory() {
     listHistory();
   }
 }
+
+function showCurrent(param) {
+  // Formats the URL that we are using to query the API
+  let queryUrl =
+    'https://api.openweathermap.org/data/2.5/weather?q=' +
+    param +
+    '&units=imperial&appid=' +
+    keyAPI;
+
+  // Fetch Data
+  $.ajax({
+    url: queryUrl,
+    method: 'GET',
+  }).then(function (r) {
+    city.text(r.name);
+    // Appends the current date after the city name
+    city.append(' <span class="text-muted" id="date">');
+    $('#date').text('(' + currentDate + ')');
+    // Appends Icon to city name
+    city.append(
+      "<img src='https://openweathermap.org/img/w/" +
+        r.weather[0].icon +
+        ".png' alt='" +
+        r.weather[0].main +
+        "' />"
+    );
+    // This section controls the temp/humidity/windspeed display
+    temp.text(r.main.temp);
+    temp.append('&deg;F');
+    humidity.text(r.main.humidity + '%');
+    windSpeed.text(r.wind.speed + 'MPH');
+  });
+}
