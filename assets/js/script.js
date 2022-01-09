@@ -23,7 +23,7 @@ $(function () {
 });
 
 // Handles the form submission when city is entered
-$($).on('submit', function (e) {
+$(document).on('submit', function (e) {
   e.preventDefault();
 
   let searchVal = searchInput.val().trim();
@@ -35,6 +35,12 @@ $($).on('submit', function (e) {
   }
 });
 
+historyButton.on('click', function () {
+  localStorage.clear();
+  cityList = [];
+  searchHistory.empty();
+});
+
 searchHistory.on('click', function (e) {
   console.log(e.target.innerHTML);
 });
@@ -42,9 +48,7 @@ searchHistory.on('click', function (e) {
 // Will save the searches to the local array and display results on sidebar
 function saveHistory(val) {
   let lowered = val.toLowerCase();
-  if (cityList.indexOf(val) === -1) {
-    cityList.push(lowered);
-  }
+  if (cityList.indexOf(val) === -1) cityList.push(lowered);
 
   listHistory();
 }
