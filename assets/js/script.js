@@ -48,7 +48,7 @@ searchHistory.on('click', function (e) {
 // Will save the searches to the local array and display results on sidebar
 function saveHistory(val) {
   let lowered = val.toLowerCase();
-  if (cityList.indexOf(val) === -1) cityList.push(lowered);
+  if (cityList.indexOf(lowered) === -1) cityList.push(lowered);
 
   listHistory();
 }
@@ -76,11 +76,7 @@ function startHistory() {
 
 function showCurrent(param) {
   // Formats the URL that we are using to query the API
-  let queryUrl =
-    'https://api.openweathermap.org/data/2.5/weather?q=' +
-    param +
-    '&units=imperial&appid=' +
-    keyAPI;
+  let queryUrl = `https://api.openweathermap.org/data/2.5/weather?q=${param}&units=imperial&appid=${keyAPI}`;
 
   // Fetch Data
   $.ajax({
@@ -109,30 +105,32 @@ function showCurrent(param) {
       // Stores latitude and longitude for uv-index
       let lat = r.coord.lat;
       let lon = r.coord.lon;
+
+      // Calls the function that calculates UV Index & five day cast
+      uvIndex(lat, lon);
+      //   fiveDayCast(lat, lon);
     })
-    .catch(function (r) {
+    .catch(function (e) {
+      console.log(e);
       alert('Your request could not be complete');
     });
-
-  uvIndex(lat, lon);
-  fiveDayCast(lat, lon);
+  //   fiveDayCast(lat, lon);
 }
 
 function uvIndex(lat, lon) {
   // Formats URL for uv call
-  let queryUrl =
-    'https://api.openweathermap.org/data/2.5/uvi?&lat=' +
-    lat +
-    '&lon=' +
-    lon +
-    '&appid=' +
-    keyAPI;
+  let queryUrl = `https://api.openweathermap.org/data/2.5/uvi?&lat=${lat}&lon=${lon}&appid=${keyAPI}`;
 
   // Performs the ajax fetch call
   $.ajax({
     url: queryUrl,
     method: 'GET',
-  }).then(function (r) {
-    indexUV.text(r.value);
-  });
+  })
+    .then(function (r) {
+      indexUV.text(r.value);
+    })
+    .catch(function (e) {
+      console.log(e);
+      alert('There was a problem with your request');
+    });
 }
