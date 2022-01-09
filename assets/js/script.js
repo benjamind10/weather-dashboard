@@ -30,13 +30,21 @@ $($).on('submit', function (e) {
   if (!searchVal) {
     alert('please enter a city');
   } else {
-    historyHandler(searchVal);
+    saveHistory(searchVal);
     searchInput.val('');
   }
 });
 
-function historyHandler(val) {
-  if (cityList.indexOf(val) === -1) cityList.push(val);
+searchHistory.on('click', function (e) {
+  console.log(e.target.innerHTML);
+});
+
+// Will save the searches to the local array and display results on sidebar
+function saveHistory(val) {
+  let lowered = val.toLowerCase();
+  if (cityList.indexOf(val) === -1) {
+    cityList.push(lowered);
+  }
 
   listHistory();
 }
@@ -47,7 +55,8 @@ function listHistory() {
   cityList.forEach(function (city) {
     let searchItem = $('<li class="list-group-item city-btn">');
     searchItem.attr('data-value', city);
-    searchItem.text(city);
+    let modedString = city.charAt(0).toUpperCase() + city.slice(1);
+    searchItem.text(modedString);
     searchHistory.prepend(searchItem);
   });
 
@@ -57,14 +66,6 @@ function listHistory() {
 function startHistory() {
   if (localStorage.getItem('cities')) {
     cityList = JSON.parse(localStorage.getItem('cities'));
-    let lastIndex = cityList.length - 1;
-    // console.log(cityList);
     listHistory();
-    // Display the last city viewed
-    // if page is refreshed
-    // if (cityList.length !== 0) {
-    //   currentConditionsRequest(cityList[lastIndex]);
-    //   weatherContent.removeClass('hide');
-    // }
   }
 }
