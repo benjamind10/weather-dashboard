@@ -86,23 +86,53 @@ function showCurrent(param) {
   $.ajax({
     url: queryUrl,
     method: 'GET',
+  })
+    .then(function (r) {
+      city.text(r.name);
+      // Appends the current date after the city name
+      city.append(' <span class="text-muted" id="date">');
+      $('#date').text('(' + currentDate + ')');
+      // Appends Icon to city name
+      city.append(
+        "<img src='https://openweathermap.org/img/w/" +
+          r.weather[0].icon +
+          ".png' alt='" +
+          r.weather[0].main +
+          "' />"
+      );
+      // This section controls the temp/humidity/windspeed display
+      temp.text(r.main.temp);
+      temp.append('&deg;F');
+      humidity.text(r.main.humidity + '%');
+      windSpeed.text(r.wind.speed + 'MPH');
+
+      // Stores latitude and longitude for uv-index
+      let lat = r.coord.lat;
+      let lon = r.coord.lon;
+    })
+    .catch(function (r) {
+      alert('Your request could not be complete');
+    });
+
+  uvIndex(lat, lon);
+  fiveDayCast(lat, lon);
+}
+
+function uvIndex(lat, lon) {
+  // Formats URL for uv call
+  let queryUrl =
+    'https://api.openweathermap.org/data/2.5/uvi?&lat=' +
+    lat +
+    '&lon=' +
+    lon +
+    '&appid=' +
+    keyAPI;
+
+  // Performs the ajax fetch call
+  $.ajax({
+    url: queryUrl,
+    method: 'GET',
   }).then(function (r) {
-    city.text(r.name);
-    // Appends the current date after the city name
-    city.append(' <span class="text-muted" id="date">');
-    $('#date').text('(' + currentDate + ')');
-    // Appends Icon to city name
-    city.append(
-      "<img src='https://openweathermap.org/img/w/" +
-        r.weather[0].icon +
-        ".png' alt='" +
-        r.weather[0].main +
-        "' />"
-    );
-    // This section controls the temp/humidity/windspeed display
-    temp.text(r.main.temp);
-    temp.append('&deg;F');
-    humidity.text(r.main.humidity + '%');
-    windSpeed.text(r.wind.speed + 'MPH');
+    indexUV.text(r.value);
   });
 }
