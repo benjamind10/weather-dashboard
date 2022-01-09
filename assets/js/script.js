@@ -155,7 +155,7 @@ function fiveDay(lon, lat) {
     .then(function (r) {
       fiveDayCast.empty();
 
-      for (var i = 1; i < r.daily.length; i++) {
+      for (let i = 1; i < r.daily.length; i++) {
         let forecastDateString = moment(r.daily[i].dt_txt).format(
           'L'
         );
