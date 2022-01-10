@@ -44,6 +44,7 @@ historyButton.on('click', function () {
   searchHistory.empty();
 });
 
+// Button haandler for the cities in history side bar
 searchHistory.on('click', function (event) {
   showCurrent(event.target.innerHTML);
 });
@@ -72,6 +73,7 @@ function listHistory() {
   localStorage.setItem('cities', JSON.stringify(cityList));
 }
 
+// Function that helps the page load the history components
 function startHistory() {
   // Checcks local storage if there is any cities saved and displays them
   if (localStorage.getItem('cities')) {
@@ -81,6 +83,7 @@ function startHistory() {
   }
 }
 
+// Performs the main API call to OpenWeather and fetches current day
 function showCurrent(param) {
   // Formats the URL that we are using to query the API
   const queryUrl = `https://api.openweathermap.org/data/2.5/weather?q=${param}&units=imperial&appid=${keyAPI}`;
@@ -123,6 +126,7 @@ function showCurrent(param) {
     });
 }
 
+// This function call will fetch the API for the uv Index
 function uvIndex(lon, lat) {
   // Formats URL for uv call
   const queryUrl = `https://api.openweathermap.org/data/2.5/uvi?&lat=${lat}&lon=${lon}&appid=${keyAPI}`;
