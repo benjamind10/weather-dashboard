@@ -12,7 +12,7 @@ let indexUV = $('#uv-index');
 let wContent = $('#weather-content');
 
 // Global Variables
-const cityList = [];
+let cityList = [];
 let currentDate = moment().format('L');
 
 // API Key
@@ -40,7 +40,7 @@ $(document).on('submit', function (event) {
 // Handles the clear history button
 historyButton.on('click', function () {
   localStorage.clear();
-  cityList.length = 0;
+  cityList = [];
   searchHistory.empty();
 });
 
@@ -75,7 +75,7 @@ function listHistory() {
 function startHistory() {
   // Checcks local storage if there is any cities saved and displays them
   if (localStorage.getItem('cities')) {
-    cityList.push(JSON.parse(localStorage.getItem('cities')));
+    cityList = JSON.parse(localStorage.getItem('cities'));
 
     listHistory();
   }
