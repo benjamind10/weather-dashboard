@@ -134,10 +134,11 @@ function uvIndex(lon, lat) {
       indexUV.text(r.value);
 
       // This conditional will add background to the uv index depending on exposure
-      if (indexUV.text() >= 8) indexUV.addClass('btn btn-danger');
+      if (indexUV.text() >= 8)
+        indexUV.addClass('bg-danger text-white p-1 rounded');
       else if (indexUV.text() > 3 && indexUV.text() <= 7)
-        indexUV.addClass('btn btn-warning');
-      else indexUV.addClass('btn btn-success');
+        indexUV.addClass('bg-warning text-white p-1 rounded');
+      else indexUV.addClass('bg-success text-white p-1 rounded');
     })
     .catch(function (e) {
       console.log(e);
@@ -161,7 +162,7 @@ function fiveDay(lon, lat) {
       let data = r.daily;
 
       for (let i = 1; i < data.length - 2; i++) {
-        let forecastDateString = moment
+        let forecastDate = moment
           .unix(data[i].dt)
           .format('MM/DD/YYYY');
 
@@ -192,7 +193,7 @@ function fiveDay(lon, lat) {
         );
 
         fIcon.attr('alt', data[i].weather[0].main);
-        fDate.text(forecastDateString);
+        fDate.text(forecastDate);
         temp.text(data[i].temp.day);
         temp.prepend('Temp: ');
         temp.append('&deg;F');
