@@ -32,6 +32,7 @@ $(document).on('submit', function (e) {
     alert('please enter a city');
   } else {
     saveHistory(searchVal);
+    showCurrent(searchVal);
     searchInput.val('');
   }
 });
@@ -44,7 +45,9 @@ historyButton.on('click', function () {
 });
 
 searchHistory.on('click', function (e) {
-  console.log(e.target.innerHTML);
+  let city = e.target.innerHTML;
+
+  showCurrent(city);
 });
 
 // Will save the searches to the local array and display results on sidebar
@@ -110,7 +113,7 @@ function showCurrent(param) {
 
       // Calls the function that calculates UV Index & five day cast
       uvIndex(lon, lat);
-      //   fiveDayCast(lat, lon);
+      fiveDay(lon, lat);
     })
     .catch(function (e) {
       console.log(e);
@@ -154,11 +157,14 @@ function fiveDay(lon, lat) {
   })
     .then(function (r) {
       fiveDayCast.empty();
+      console.log(r);
+      let data = r.daily;
 
-      for (let i = 1; i < r.daily.length; i++) {
-        let forecastDateString = moment(r.daily[i].dt_txt).format(
-          'L'
-        );
+      for (let i = 1; i < data.length - 2; i++) {
+        let forecastDateString = moment
+          .unix(data[i].dt)
+          .format('MM/DD/YYYY');
+
         let col = $(
           "<div class='col-12 col-md-6 col-lg forecast-day mb-3'>"
         );
@@ -181,16 +187,16 @@ function fiveDay(lon, lat) {
         fIcon.attr(
           'src',
           'https://openweathermap.org/img/w/' +
-            r.daily[i].weather[0].icon +
+            data[i].weather[0].icon +
             '.png'
         );
 
-        fIcon.attr('alt', r.daily[i].weather[0].main);
+        fIcon.attr('alt', data[i].weather[0].main);
         fDate.text(forecastDateString);
-        temp.text(r.daily[i].temp.day);
+        temp.text(data[i].temp.day);
         temp.prepend('Temp: ');
         temp.append('&deg;F');
-        humidity.text(r.daily[i].humidity);
+        humidity.text(data[i].humidity);
         humidity.prepend('Humidity: ');
         humidity.append('%');
       }
