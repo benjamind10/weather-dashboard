@@ -12,7 +12,7 @@ let indexUV = $('#uv-index');
 let wContent = $('#weather-content');
 
 // Global Variables
-let cityList = [];
+const cityList = [];
 let currentDate = moment().format('L');
 
 // API Key
@@ -24,8 +24,8 @@ $(function () {
 });
 
 // Handles the form submission when city is entered
-$(document).on('submit', function (e) {
-  e.preventDefault();
+$(document).on('submit', function (event) {
+  event.preventDefault();
 
   let searchVal = searchInput.val().trim();
   if (!searchVal) {
@@ -40,14 +40,12 @@ $(document).on('submit', function (e) {
 // Handles the clear history button
 historyButton.on('click', function () {
   localStorage.clear();
-  cityList = [];
+  cityList.length = 0;
   searchHistory.empty();
 });
 
-searchHistory.on('click', function (e) {
-  let city = e.target.innerHTML;
-
-  showCurrent(city);
+searchHistory.on('click', function (event) {
+  showCurrent(event.target.innerHTML);
 });
 
 // Will save the searches to the local array and display results on sidebar
@@ -61,9 +59,11 @@ function saveHistory(val) {
 function listHistory() {
   searchHistory.empty();
 
+  // Loop the city list array to display the cities in sidebar
   cityList.forEach(function (city) {
     let searchItem = $('<li class="list-group-item city-btn">');
     searchItem.attr('data-value', city);
+
     let modedString = city.charAt(0).toUpperCase() + city.slice(1);
     searchItem.text(modedString);
     searchHistory.prepend(searchItem);
@@ -73,8 +73,10 @@ function listHistory() {
 }
 
 function startHistory() {
+  // Checcks local storage if there is any cities saved and displays them
   if (localStorage.getItem('cities')) {
-    cityList = JSON.parse(localStorage.getItem('cities'));
+    cityList.push(JSON.parse(localStorage.getItem('cities')));
+
     listHistory();
   }
 }
@@ -88,35 +90,35 @@ function showCurrent(param) {
     url: queryUrl,
     method: 'GET',
   })
-    .then(function (r) {
-      city.text(r.name);
+    .then(function (response) {
+      city.text(response.name);
       // Appends the current date after the city name
       city.append(' <span class="text-muted" id="date">');
       $('#date').text('(' + currentDate + ')');
       // Appends Icon to city name
       city.append(
         "<img src='https://openweathermap.org/img/w/" +
-          r.weather[0].icon +
+          response.weather[0].icon +
           ".png' alt='" +
-          r.weather[0].main +
+          response.weather[0].main +
           "' />"
       );
       // This section controls the temp/humidity/windspeed display
-      temp.text(r.main.temp);
+      temp.text(response.main.temp);
       temp.append('&deg;F');
-      humidity.text(r.main.humidity + '%');
-      windSpeed.text(r.wind.speed + 'MPH');
+      humidity.text(response.main.humidity + '%');
+      windSpeed.text(response.wind.speed + 'MPH');
 
       // Stores latitude and longitude for uv-index
-      let lon = r.coord.lon;
-      let lat = r.coord.lat;
+      let lon = response.coord.lon;
+      let lat = response.coord.lat;
 
       // Calls the function that calculates UV Index & five day cast
       uvIndex(lon, lat);
       fiveDay(lon, lat);
     })
-    .catch(function (e) {
-      console.log(e);
+    .catch(function (error) {
+      console.log(error);
       alert('Your request could not be complete');
     });
 }
@@ -130,18 +132,20 @@ function uvIndex(lon, lat) {
     url: queryUrl,
     method: 'GET',
   })
-    .then(function (r) {
-      indexUV.text(r.value);
+    .then(function (response) {
+      indexUV.text(response.value);
+
+      let indexVal = indexUV.text();
 
       // This conditional will add background to the uv index depending on exposure
-      if (indexUV.text() >= 8)
+      if (indexVal >= 8)
         indexUV.addClass('bg-danger text-white p-1 rounded');
-      else if (indexUV.text() > 3 && indexUV.text() <= 7)
+      else if (indexVal > 3 && indexVal <= 7)
         indexUV.addClass('bg-warning text-white p-1 rounded');
       else indexUV.addClass('bg-success text-white p-1 rounded');
     })
-    .catch(function (e) {
-      console.log(e);
+    .catch(function (error) {
+      console.log(error);
       alert('There was a problem with your request');
     });
 }
@@ -156,16 +160,17 @@ function fiveDay(lon, lat) {
     url: queryUrl,
     method: 'GET',
   })
-    .then(function (r) {
+    .then(function (response) {
       fiveDayCast.empty();
-      console.log(r);
-      let data = r.daily;
+      let data = response.daily;
 
+      // Loop the five day forecast
       for (let i = 1; i < data.length - 2; i++) {
         let forecastDate = moment
           .unix(data[i].dt)
           .format('MM/DD/YYYY');
 
+        // Declare variables for the forecast cards
         let col = $(
           "<div class='col-12 col-md-6 col-lg forecast-day mb-3'>"
         );
@@ -176,6 +181,7 @@ function fiveDay(lon, lat) {
         let temp = $("<p class='card-text mb-0'>");
         let humidity = $("<p class='card-text mb-0'>");
 
+        // Appends new elements to the actual card
         fiveDayCast.append(col);
         col.append(card);
         card.append(cardBody);
@@ -202,8 +208,8 @@ function fiveDay(lon, lat) {
         humidity.append('%');
       }
     })
-    .catch(function (e) {
-      console.log(e);
+    .catch(function (error) {
+      console.log(error);
       alert('Your request could not be complete');
     });
 }
