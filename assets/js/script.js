@@ -13,7 +13,7 @@ let wContent = $('#weather-content');
 
 // Global Variables
 let cityList = [];
-let currentDate = moment().format('L');
+let currentDate = new Date().toLocaleDateString();
 
 // API Key
 const keyAPI = '6a3fe9ad9cae721016566b17c55f3ba7';
@@ -166,9 +166,9 @@ function fiveDay(lon, lat) {
 
       // Loop the five day forecast
       for (let i = 1; i < data.length - 2; i++) {
-        let forecastDate = moment
-          .unix(data[i].dt)
-          .format('MM/DD/YYYY');
+        let forecastDate = new Date(
+          data[i].dt * 1000
+        ).toLocaleDateString();
 
         // Declare variables for the forecast cards
         let col = $(
