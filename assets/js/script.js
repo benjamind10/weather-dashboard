@@ -69,8 +69,6 @@ function listHistory() {
     searchItem.text(modedString);
     searchHistory.prepend(searchItem);
   });
-
-  localStorage.setItem('cities', JSON.stringify(cityList));
 }
 
 // Function that helps the page load the history components
@@ -100,12 +98,9 @@ function showCurrent(param) {
       $('#date').text('(' + currentDate + ')');
       // Appends Icon to city name
       city.append(
-        "<img src='https://openweathermap.org/img/w/" +
-          response.weather[0].icon +
-          ".png' alt='" +
-          response.weather[0].main +
-          "' />"
+        `<img src=https://openweathermap.org/img/w/${response.weather[0].icon}.png alt=${response.weather[0].main} />`
       );
+
       // This section controls the temp/humidity/windspeed display
       temp.text(response.main.temp);
       temp.append('&deg;F');
@@ -184,6 +179,7 @@ function fiveDay(lon, lat) {
         let fIcon = $('<img>');
         let temp = $("<p class='card-text mb-0'>");
         let humidity = $("<p class='card-text mb-0'>");
+        let windSpeed = $("<p class='card-text mb-0'>");
 
         // Appends new elements to the actual card
         fiveDayCast.append(col);
@@ -193,13 +189,12 @@ function fiveDay(lon, lat) {
         cardBody.append(fDate);
         cardBody.append(fIcon);
         cardBody.append(temp);
+        cardBody.append(windSpeed);
         cardBody.append(humidity);
 
         fIcon.attr(
           'src',
-          'https://openweathermap.org/img/w/' +
-            data[i].weather[0].icon +
-            '.png'
+          `https://openweathermap.org/img/w/${data[i].weather[0].icon}.png`
         );
 
         fIcon.attr('alt', data[i].weather[0].main);
@@ -210,6 +205,8 @@ function fiveDay(lon, lat) {
         humidity.text(data[i].humidity);
         humidity.prepend('Humidity: ');
         humidity.append('%');
+        windSpeed.text(data[i].wind_speed);
+        windSpeed.prepend('Wind Speed: ');
       }
     })
     .catch(function (error) {
